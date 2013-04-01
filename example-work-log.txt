@@ -1,0 +1,5 @@
+3/29/2013:
+  project: PROJECT-ID
+  hours: 2
+  comments: >
+    Some comments about this work item
