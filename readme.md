@@ -1,6 +1,6 @@
 ![Tempo Tantrum](http://sht.tl/1Ezu "Tempo Tantrum")
 
-### Tempo Tantrum
+## Tempo Tantrum
 
 Hate updating Tempo manually? Of course you do. Use Tempo Tantrum instead and
 update your time tracking in batches with a simple text file containing your
