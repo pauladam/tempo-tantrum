@@ -18,14 +18,15 @@ Update `~/.tempo-tantrum` with your Jira configuration
     pass: pass
 
 
-`ex. work-log.txt`
+And create your work log, a YAML list of work log items keyed by date.
 
-    03/27/2013
+`ex. work-log.yaml`
 
-      comment: text
-      issue: SAPTESTDRIVE-23
-      time: 5
-
+    3/29/2013:
+      project: PROJECT-ID
+      hours: 2
+      comments: >
+        Some comments about this work item
 
 And run tempo-tantrum with your work log
 
