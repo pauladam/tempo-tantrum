@@ -18,7 +18,7 @@ Update `~/.tempo-tantrum` with your Jira configuration
     pass: pass
 
 
-`ex. work-log.txt_`
+`ex. work-log.txt`
 
     03/27/2013
 
