@@ -29,7 +29,7 @@ Update `~/.tempo-tantrum` with your Jira configuration
 
 And run tempo-tantrum with your work log
 
-$ tempo-tantrum le-work-log
+    $ tempo-tantrum le-work-log
 
 Note that tempo-tantrum is **not** stateful **nor** idempotent therefore you should
 be probably run tempo-tantrum with a fresh log each time.
