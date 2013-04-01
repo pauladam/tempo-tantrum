@@ -8,28 +8,26 @@ work log.
 
 ### Usage
 
-Update ~/.tempo-tantrum with your Jira configuration
+Update `~/.tempo-tantrum` with your Jira configuration
 
-_ex. ~/.tempo-tantrum config_
-
-
-  jira location: https://jira-host
-  user: user
-  pass: pass
+`ex. ~/.tempo-tantrum config`
 
 
-_ex. work-log.txt_
-
-  03/27/2013
-
-    comment: text
-    issue: SAPTESTDRIVE-23
-    time: 5
+    jira location: https://jira-host
+    user: user
+    pass: pass
 
 
-<< config info .>>
+`ex. work-log.txt_`
 
-Then run tempo-tantrum with your work log
+    03/27/2013
+
+      comment: text
+      issue: SAPTESTDRIVE-23
+      time: 5
+
+
+And run tempo-tantrum with your work log
 
 $ tempo-tantrum le-work-log
 
