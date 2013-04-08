@@ -4,6 +4,9 @@ require 'cgi'
 require 'yaml'
 require 'date'
 
+# TODO if not given a file, run in interactive mode where
+# it prompts for events, until done
+
 config = YAML.load(File.open(File.expand_path("~/.tempo-tantrum")).read)
 
 if ARGV.length < 1
@@ -43,7 +46,7 @@ def login login_url, jira_url, schemeless_jira_url, user, pass
   --data "os_username=#{user}&os_password=#{pass}&os_destination=&atl_token=&login=Log+In"
   HERE
   p curl_login
-  # p `#{curl_login}`
+  `#{curl_login}`
 end
 
 def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
@@ -82,7 +85,7 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
   HERE
 
   puts curl_update_tempo
-  # p `#{curl_update_tempo}`
+  p `#{curl_update_tempo}`
 
 end
 
@@ -91,7 +94,8 @@ if __FILE__ == $0
   login login_url, jira_url, schemeless_jira_url, user, pass
 
   work_log.each do |work_date, log|
-    post_log user, pass, jira_url, schemeless_jira_url, work_date, log
+    p work_date
+    # post_log user, pass, jira_url, schemeless_jira_url, work_date, log
   end
 
   puts "All done, go get a cup of coffee"
