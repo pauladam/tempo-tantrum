@@ -85,7 +85,8 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
   HERE
 
   puts curl_update_tempo
-  p `#{curl_update_tempo}`
+  resp = `#{curl_update_tempo}`
+  resp
 
 end
 
@@ -93,9 +94,10 @@ if __FILE__ == $0
 
   login login_url, jira_url, schemeless_jira_url, user, pass
 
-  work_log.each do |work_date, log|
-    p work_date
-    # post_log user, pass, jira_url, schemeless_jira_url, work_date, log
+  work_log.each do |work_date, log_set|
+    log_set.each do |work_log|
+      post_log user, pass, jira_url, schemeless_jira_url, work_date, work_log
+    end
   end
 
   puts "All done, go get a cup of coffee"

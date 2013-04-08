@@ -23,10 +23,32 @@ And create your work log, a YAML list of work log items keyed by date.
 `ex. work-log.yaml`
 
     3/29/2013:
-      project: PROJECT-ID
-      hours: 2
-      comments: >
-        Some comments about this work item
+
+      - project: PROJECT-ID
+        hours: 2
+        comments: >
+          Some comments
+
+      - project: ANOTHER-PROJECT-ID
+        hours: 3
+        comments: >
+          Some more comments
+
+    3/30/2013:
+
+      - project: PROJECT-ID
+        hours: 2
+        comments: >
+          Some comments
+
+      - project: ANOTHER-PROJECT-ID
+        hours: 3
+        comments: >
+          Some more comments
+
+
+Notice that the work log is a list of date blocks and each date block contains
+a list of project work log items.
 
 And run tempo-tantrum with your work log
 
