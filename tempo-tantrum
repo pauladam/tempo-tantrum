@@ -4,18 +4,34 @@ require 'cgi'
 require 'yaml'
 require 'date'
 
-# TODO if not given a file, run in interactive mode where
-# it prompts for events, until done
-
 config = YAML.load(File.open(File.expand_path("~/.tempo-tantrum")).read)
 
 if ARGV.length < 1
-  puts "Usage: tempo-tantrum work-log"
-  exit
+
+  work_log = {}
+  puts 'Entering interactive mode'
+  print 'Date (ex. 4/9/2013): '
+  work_log[gets.chomp.downcase] = {}
+  d = work_log.keys.first
+  entry = {}
+  puts 'Enter work log'
+  print 'Project: '
+  entry['project'] = gets.chomp.upcase
+  print 'Hours: '
+  entry['hours'] = gets.chomp.downcase
+  print 'Comments: '
+  entry['comments'] = gets.chomp
+
+  work_log[d] = [entry]
+
+else
+
+  work_log_fn = ARGV.shift
+  work_log = YAML.load(File.open(work_log_fn).read)
+
 end
 
-work_log_fn = ARGV.shift
-work_log = YAML.load(File.open(work_log_fn).read)
+p work_log
 
 user = config['user']
 pass = config['pass']
@@ -86,6 +102,7 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
 
   puts curl_update_tempo
   resp = `#{curl_update_tempo}`
+  p resp
   resp
 
 end
@@ -96,6 +113,7 @@ if __FILE__ == $0
 
   work_log.each do |work_date, log_set|
     log_set.each do |work_log|
+      p work_log
       post_log user, pass, jira_url, schemeless_jira_url, work_date, work_log
     end
   end
