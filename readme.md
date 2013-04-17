@@ -66,6 +66,7 @@ Enter work log
 Project: PROJECT-ID
 Hours: 1
 Comments: Some stuff
+All done, go get a cup of coffee
 ```
 
 Note that tempo-tantrum is **not** stateful **nor** idempotent therefore you should
