@@ -54,6 +54,17 @@ And run tempo-tantrum with your work log
 
     $ tempo-tantrum le-work-log
 
+OR run it without a filename for interactive mode!
+
+    $: ./tempo-tantrum
+    Entering interactive mode
+    Date (ex. 4/9/2013): 4/16/2013
+    Enter work log
+    Project: PROJECT-ID
+    Hours: 1
+    Comments: Some stuff
+      
+
 Note that tempo-tantrum is **not** stateful **nor** idempotent therefore you should
 be probably run tempo-tantrum with a fresh log each time.
 
