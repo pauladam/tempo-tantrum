@@ -31,8 +31,6 @@ else
 
 end
 
-p work_log
-
 user = config['user']
 pass = config['pass']
 jira_url = config['jira location']
@@ -61,7 +59,6 @@ def login login_url, jira_url, schemeless_jira_url, user, pass
   -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
   --data "os_username=#{user}&os_password=#{pass}&os_destination=&atl_token=&login=Log+In"
   HERE
-  p curl_login
   `#{curl_login}`
 end
 
@@ -72,12 +69,6 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
   comments = CGI::escape(log['comments'])
   dt = DateTime.strptime(work_date, '%m/%d/%Y')
   date_str = CGI::escape(dt.strftime('%d/%b/%y'))
-
-  p work_date
-  p log
-
-  p date_str
-  p comments
 
   curl_update_tempo = <<-HERE
     curl \
@@ -102,7 +93,6 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
 
   puts curl_update_tempo
   resp = `#{curl_update_tempo}`
-  p resp
   resp
 
 end
@@ -113,7 +103,6 @@ if __FILE__ == $0
 
   work_log.each do |work_date, log_set|
     log_set.each do |work_log|
-      p work_log
       post_log user, pass, jira_url, schemeless_jira_url, work_date, work_log
     end
   end
