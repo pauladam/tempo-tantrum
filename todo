@@ -1,0 +1,8 @@
+# TODOs
+
+* Set date to default to today in interactive mode and allow that to be chosen
+without filling in by hand
+
+* Save history to a file
+
+
