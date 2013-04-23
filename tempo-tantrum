@@ -23,9 +23,11 @@ if ARGV.length < 1
   entry['project'] = gets.chomp.upcase
   print 'Hours: '
   entry['hours'] = gets.chomp.downcase
-  print 'Comments: '
-  entry['comments'] = gets.chomp
-
+  print 'Comments (type END when finished): '
+  old_gets_terminator = $/
+  $/ = "END"
+  entry['comments'] = STDIN.gets
+  $/ = old_gets_terminator
   work_log[d] = [entry]
 
 else
