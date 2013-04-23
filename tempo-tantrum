@@ -10,8 +10,12 @@ if ARGV.length < 1
 
   work_log = {}
   puts 'Entering interactive mode'
-  print 'Date (ex. 4/9/2013): '
-  work_log[gets.chomp.downcase] = {}
+  today = Time.now.strftime '%m/%d/%Y'
+  print 'Date (ex. %s): ' % today
+  log_date = gets.chomp.downcase.strip
+  log_date = today unless log_date != ''
+  puts 'Using date %s' % log_date
+  work_log[log_date] = {}
   d = work_log.keys.first
   entry = {}
   puts 'Enter work log'
@@ -108,6 +112,6 @@ if __FILE__ == $0
   end
 
   puts "All done, go get a cup of coffee"
-  puts " ... "
+  puts "Or visit your tempo page if you must %s " % "#{jira_url}/secure/TempoUserBoard!timesheet.jspa"
 
 end
