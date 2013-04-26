@@ -46,6 +46,7 @@ login_url = "%s/login.jsp" % jira_url
 def login login_url, jira_url, schemeless_jira_url, user, pass
   curl_login = <<-HERE
   curl \
+  -s \
   -c ~/.tempo-tantrum-cookies \
   -b ~/.tempo-tantrum-cookies \
   --compressed \
@@ -63,7 +64,7 @@ def login login_url, jira_url, schemeless_jira_url, user, pass
   -H "Connection: keep-alive" \
   -H "DNT: 1" \
   -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
-  --data "os_username=#{user}&os_password=#{pass}&os_destination=&atl_token=&login=Log+In"
+  --data "os_username=#{user}&os_password=#{pass}&os_destination=&atl_token=&login=Log+In 2>&1 > /dev/null"
   HERE
   `#{curl_login}`
 end
@@ -78,6 +79,7 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
 
   curl_update_tempo = <<-HERE
     curl \
+    -s \
     -c ~/.tempo-tantrum-cookies \
     -b ~/.tempo-tantrum-cookies \
     --compressed \
@@ -94,10 +96,9 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
     -H "Connection: keep-alive" \
     -H "DNT: 1" \
     -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
-    --data "user=#{user}&id=&type=&selected-panel=0&startTimeEnabled=false&tracker=false&planning=false&issue=#{project}&date=#{date_str}&enddate=#{date_str}&time=#{hours}&remainingEstimate=0&comment=#{comments}"
+    --data "user=#{user}&id=&type=&selected-panel=0&startTimeEnabled=false&tracker=false&planning=false&issue=#{project}&date=#{date_str}&enddate=#{date_str}&time=#{hours}&remainingEstimate=0&comment=#{comments} 2>&1 > /dev/null"
   HERE
 
-  puts curl_update_tempo
   resp = `#{curl_update_tempo}`
   resp
 

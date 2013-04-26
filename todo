@@ -1,8 +1,5 @@
-# TODOs
-
-* Set date to default to today in interactive mode and allow that to be chosen
-without filling in by hand
+## TODOs
 
 * Save history to a file
 
-
+* add verbose flag to show curl output, otherwise it should be silent
