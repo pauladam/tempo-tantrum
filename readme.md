@@ -45,6 +45,33 @@ And create your work log, a YAML list of work log items keyed by date.
     hours: 3
     comments: >
       Some more comments
+
+4/1/2013:
+
+  - project: PROJECT-1-ID
+    hours: 2
+    comments: >
+      Some comments
+
+  - project: PROJECT-2-ID
+    startTime: 8:30 am
+    endTime: 9:30 am
+    comments: >
+      Some more comments
+
+  - project: PROJECT-3-ID
+    worklog:
+      -
+        startTime: 9:30 am
+        endTime: 10:30 am
+        comments: >
+          Work log 1 comment
+      -
+        hours: 2
+        comments: >
+          Work log 2 comment
+    comments: >
+      Project 3 comment
 ```
 
 Notice that the work log is a list of date blocks and each date block contains

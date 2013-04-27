@@ -80,9 +80,9 @@ def login login_url, jira_url, schemeless_jira_url, user, pass
   `#{curl_login}`
 end
 
-def duration_in_hours slip
-  startTime = Time.parse(slip['startTime'])
-  endTime = Time.parse(slip['endTime'])
+def duration_in_hours log
+  startTime = Time.parse(log['startTime'])
+  endTime = Time.parse(log['endTime'])
   (endTime - startTime)/60/60
 end
 
@@ -97,15 +97,15 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log, options
   	hours = log['hours']
   end
 
-  if log.key?('slips')
-    log["slips"].each do |slip|
-      if slip.key?('startTime')
-        hours += duration_in_hours(slip)
-      elsif log.key?('hours')
-        hours = hours + slip['hours']
+  if log.key?('worklog')
+    log["worklog"].each do |log_entry|
+      if log_entry.key?('startTime')
+        hours += duration_in_hours(log_entry)
+      elsif log_entry.key?('hours')
+        hours = hours + log_entry['hours']
       end
 
-      comments = comments + CGI::escape(slip['comments'])
+      comments = comments + CGI::escape(log_entry['comments'])
     end
   end
 
