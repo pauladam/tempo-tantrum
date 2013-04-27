@@ -3,11 +3,28 @@
 require 'cgi'
 require 'yaml'
 require 'date'
+require 'time'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: tempo-tantrum [options]"
+
+  opts.on("-t", "--test", "Test worklog") do |v|
+    options[:test] = v
+  end
+
+  opts.on("-w", "--worklog FILENAME", "Worklog file") do |v|
+    options[:worklog] = v
+  end
+end.parse!
 
 config = YAML.load(File.open(File.expand_path("~/.tempo-tantrum")).read)
 
-if ARGV.length < 1
-
+if options[:worklog]
+  work_log_fn = options[:worklog]
+  work_log = YAML.load(File.open(work_log_fn).read)
+else
   work_log = {}
   puts 'Entering interactive mode'
   today = Time.now.strftime '%m/%d/%Y'
@@ -29,12 +46,6 @@ if ARGV.length < 1
   entry['comments'] = STDIN.gets
   $/ = old_gets_terminator
   work_log[d] = [entry]
-
-else
-
-  work_log_fn = ARGV.shift
-  work_log = YAML.load(File.open(work_log_fn).read)
-
 end
 
 user = config['user']
@@ -69,39 +80,68 @@ def login login_url, jira_url, schemeless_jira_url, user, pass
   `#{curl_login}`
 end
 
-def post_log user, pass, jira_url, schemeless_jira_url, work_date, log
+def duration_in_hours slip
+  startTime = Time.parse(slip['startTime'])
+  endTime = Time.parse(slip['endTime'])
+  (endTime - startTime)/60/60
+end
 
-  hours = log['hours']
+def post_log user, pass, jira_url, schemeless_jira_url, work_date, log, options
+
+  hours = 0.0
+  comments = ''
+
+  if log.key?('startTime')
+    hours = duration_in_hours(log)
+  elsif log.key?('hours')
+  	hours = log['hours']
+  end
+
+  if log.key?('slips')
+    log["slips"].each do |slip|
+      if slip.key?('startTime')
+        hours += duration_in_hours(slip)
+      elsif log.key?('hours')
+        hours = hours + slip['hours']
+      end
+
+      comments = comments + CGI::escape(slip['comments'])
+    end
+  end
+
   project = log['project']
-  comments = CGI::escape(log['comments'])
+  comments += CGI::escape(log['comments'])
   dt = DateTime.strptime(work_date, '%m/%d/%Y')
   date_str = CGI::escape(dt.strftime('%d/%b/%y'))
 
-  curl_update_tempo = <<-HERE
-    curl \
-    -s \
-    -c ~/.tempo-tantrum-cookies \
-    -b ~/.tempo-tantrum-cookies \
-    --compressed \
-    "#{jira_url}/rest/tempo-rest/1.0/worklogs/#{project}" \
-    -H "Origin: #{jira_url}" \
-    -H "Accept-Encoding: gzip,deflate,sdch" \
-    -H "Host: #{schemeless_jira_url}" \
-    -H "Accept-Language: en-US,en;q=0.8" \
-    -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -H "Accept: application/xml, text/xml, */*; q=0.01" \
-    -H "Referer: #{jira_url}/secure/TempoUserBoard\!timesheet.jspa?v=1&period=28032013&periodType=BILLING&periodView=DAY" \
-    -H "X-Requested-With: XMLHttpRequest" \
-    -H "Connection: keep-alive" \
-    -H "DNT: 1" \
-    -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
-    --data "user=#{user}&id=&type=&selected-panel=0&startTimeEnabled=false&tracker=false&planning=false&issue=#{project}&date=#{date_str}&enddate=#{date_str}&time=#{hours}&remainingEstimate=0&comment=#{comments} 2>&1 > /dev/null"
-  HERE
+  puts "%-30s %3.2f" % [project, hours]
+  if !options[:test]
+    curl_update_tempo = <<-HERE
+      curl \
+      -s \
+      -c ~/.tempo-tantrum-cookies \
+      -b ~/.tempo-tantrum-cookies \
+      --compressed \
+      "#{jira_url}/rest/tempo-rest/1.0/worklogs/#{project}" \
+      -H "Origin: #{jira_url}" \
+      -H "Accept-Encoding: gzip,deflate,sdch" \
+      -H "Host: #{schemeless_jira_url}" \
+      -H "Accept-Language: en-US,en;q=0.8" \
+      -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31" \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      -H "Accept: application/xml, text/xml, */*; q=0.01" \
+      -H "Referer: #{jira_url}/secure/TempoUserBoard\!timesheet.jspa?v=1&period=28032013&periodType=BILLING&periodView=DAY" \
+      -H "X-Requested-With: XMLHttpRequest" \
+      -H "Connection: keep-alive" \
+      -H "DNT: 1" \
+      -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
+      --data "user=#{user}&id=&type=&selected-panel=0&startTimeEnabled=false&tracker=false&planning=false&issue=#{project}&date=#{date_str}&enddate=#{date_str}&time=#{hours}&remainingEstimate=0&comment=#{comments} 2>&1 > /dev/null"
+    HERE
 
-  resp = `#{curl_update_tempo}`
-  resp
-
+    resp = `#{curl_update_tempo}`
+    resp
+  end
+  hours
 end
 
 if __FILE__ == $0
@@ -109,11 +149,20 @@ if __FILE__ == $0
   login login_url, jira_url, schemeless_jira_url, user, pass
 
   work_log.each do |work_date, log_set|
-    log_set.each do |work_log|
-      post_log user, pass, jira_url, schemeless_jira_url, work_date, work_log
+    if log_set
+      puts ""
+      puts "Worklog: %s" % work_date
+      puts "-" * 40
+      totalHours = 0.0
+      log_set.each do |wl|
+        totalHours += post_log user, pass, jira_url, schemeless_jira_url, work_date, wl, options
+      end
+      puts "-" * 40
+      puts "%-30s %3.2f" % ["Total Hours", totalHours]
     end
   end
 
+  puts ""
   puts "All done, go get a cup of coffee"
   puts "Or visit your tempo page if you must %s " % "#{jira_url}/secure/TempoUserBoard!timesheet.jspa"
 
