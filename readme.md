@@ -80,7 +80,7 @@ a list of project work log items.
 And run tempo-tantrum with your work log
 
 ```bash
-$ tempo-tantrum le-work-log
+$ tempo-tantrum -w le-work-log
 ```
 
 OR run it without a filename for interactive mode!
