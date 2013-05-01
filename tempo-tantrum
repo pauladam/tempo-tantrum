@@ -40,13 +40,14 @@ else
   entry['project'] = gets.chomp.upcase
   print 'Hours: '
   entry['hours'] = gets.chomp.downcase
-  print 'Comments (type END when finished): '
+  puts 'Comments (type END when finished): '
   old_gets_terminator = $/
   $/ = "END"
-  entry['comments'] = STDIN.gets
+  entry['comments'] = STDIN.gets.gsub /END$/, ''
   $/ = old_gets_terminator
   work_log[d] = [entry]
 end
+
 
 user = config['user']
 pass = config['pass']
@@ -75,7 +76,7 @@ def login login_url, jira_url, schemeless_jira_url, user, pass
   -H "Connection: keep-alive" \
   -H "DNT: 1" \
   -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
-  --data "os_username=#{user}&os_password=#{pass}&os_destination=&atl_token=&login=Log+In 2>&1 > /dev/null"
+  --data "os_username=#{user}&os_password=#{pass}&os_destination=&atl_token=&login=Log+In" > /dev/null 2>&1
   HERE
   `#{curl_login}`
 end
@@ -104,7 +105,6 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log, options
       elsif log_entry.key?('hours')
         hours = hours + log_entry['hours']
       end
-
       comments = comments + CGI::escape(log_entry['comments'])
     end
   end
@@ -135,13 +135,15 @@ def post_log user, pass, jira_url, schemeless_jira_url, work_date, log, options
       -H "Connection: keep-alive" \
       -H "DNT: 1" \
       -H "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3" \
-      --data "user=#{user}&id=&type=&selected-panel=0&startTimeEnabled=false&tracker=false&planning=false&issue=#{project}&date=#{date_str}&enddate=#{date_str}&time=#{hours}&remainingEstimate=0&comment=#{comments} 2>&1 > /dev/null"
+      --data "user=#{user}&id=&type=&selected-panel=0&startTimeEnabled=false&tracker=false&planning=false&issue=#{project}&date=#{date_str}&enddate=#{date_str}&time=#{hours}&remainingEstimate=0&comment=#{comments}" > /dev/null 2>&1
     HERE
 
     resp = `#{curl_update_tempo}`
     resp
+
   end
-  hours
+
+  hours.to_i
 end
 
 if __FILE__ == $0
@@ -163,7 +165,6 @@ if __FILE__ == $0
   end
 
   puts ""
-  puts "All done, go get a cup of coffee"
-  puts "Or visit your tempo page if you must %s " % "#{jira_url}/secure/TempoUserBoard!timesheet.jspa"
+  puts "Go visit tempo (if you must) %s " % "#{jira_url}/secure/TempoUserBoard!timesheet.jspa"
 
 end
